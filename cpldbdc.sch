@@ -1,0 +1,44 @@
+v 20081231 1
+C 42000 43100 1 0 0 ft245rl.sym
+{
+T 43245 47455 5 10 1 1 0 0 1
+refdes=U?
+T 43645 46755 5 10 0 1 0 0 1
+footprint=TSSOP28
+T 43845 47455 5 10 1 1 0 0 1
+device=FT245RL
+}
+C 47500 45000 1 0 0 xc2c-vq44-bank2.sym
+{
+T 48000 47800 5 10 1 1 0 0 1
+device=XC2C VQ44
+T 48100 47600 5 10 1 1 0 0 1
+comment=I/O bank 2
+T 48250 45700 5 10 1 1 0 0 1
+refdes=U?
+}
+C 50200 40400 1 0 0 xc2c-vq44-power.sym
+{
+T 50650 40900 5 10 1 1 0 0 1
+comment=Power+JTAG
+T 50650 42600 5 10 1 1 0 0 1
+device=XC2C VQ44
+T 50850 41400 5 10 1 1 0 0 1
+refdes=U?
+}
+C 52700 45000 1 0 0 xc2c-vq44-bank2.sym
+{
+T 53200 47800 5 10 1 1 0 0 1
+device=XC2C VQ44
+T 53300 47600 5 10 1 1 0 0 1
+comment=I/O bank 2
+T 53450 45700 5 10 1 1 0 0 1
+refdes=U?
+}
+C 54300 41100 1 0 0 txo-1.sym
+{
+T 54500 42700 5 10 1 1 0 0 1
+refdes=U?
+T 54500 43100 5 10 0 0 0 0 1
+device=VTXO
+}

@@ -1,0 +1,222 @@
+v 20081231 1
+P 150 2400 350 2400 1 0 0
+{
+T 150 2400 5 10 0 0 0 0 1
+pintype=unknown
+T 405 2395 5 10 1 1 0 0 1
+pinlabel=IO1
+T 255 2445 5 10 1 1 0 6 1
+pinnumber=38
+T 150 2400 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 2200 350 2200 1 0 0
+{
+T 150 2200 5 10 0 0 0 0 1
+pintype=unknown
+T 405 2195 5 10 1 1 0 0 1
+pinlabel=I/O
+T 255 2245 5 10 1 1 0 6 1
+pinnumber=37
+T 150 2200 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 2000 350 2000 1 0 0
+{
+T 150 2000 5 10 0 0 0 0 1
+pintype=unknown
+T 405 1995 5 10 1 1 0 0 1
+pinlabel=I/O
+T 255 2045 5 10 1 1 0 6 1
+pinnumber=36
+T 150 2000 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 1800 350 1800 1 0 0
+{
+T 150 1800 5 10 0 0 0 0 1
+pintype=unknown
+T 405 1795 5 10 1 1 0 0 1
+pinlabel=GOE
+T 255 1845 5 10 1 1 0 6 1
+pinnumber=34
+T 150 1800 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 1400 350 1400 1 0 0
+{
+T 150 1400 5 10 0 0 0 0 1
+pintype=unknown
+T 405 1395 5 10 1 1 0 0 1
+pinlabel=GOE
+T 255 1445 5 10 1 1 0 6 1
+pinnumber=32\
+T 150 1400 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 1200 350 1200 1 0 0
+{
+T 150 1200 5 10 0 0 0 0 1
+pintype=unknown
+T 405 1195 5 10 1 1 0 0 1
+pinlabel=GOE
+T 255 1245 5 10 1 1 0 6 1
+pinnumber=31
+T 150 1200 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 1000 350 1000 1 0 0
+{
+T 150 1000 5 10 0 0 0 0 1
+pintype=unknown
+T 405 995 5 10 1 1 0 0 1
+pinlabel=IO8GSR
+T 255 1045 5 10 1 1 0 6 1
+pinnumber=30
+T 150 1000 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 2000 1750 2000 1 0 0
+{
+T 1950 2000 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 1995 5 10 1 1 0 6 1
+pinlabel=I/O
+T 1845 2045 5 10 1 1 0 0 1
+pinnumber=27
+T 1950 2000 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 1800 1750 1800 1 0 0
+{
+T 1950 1800 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 1795 5 10 1 1 0 6 1
+pinlabel=I/O
+T 1845 1845 5 10 1 1 0 0 1
+pinnumber=23
+T 1950 1800 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 1600 1750 1600 1 0 0
+{
+T 1950 1600 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 1595 5 10 1 1 0 6 1
+pinlabel=I/O
+T 1845 1645 5 10 1 1 0 0 1
+pinnumber=22
+T 1950 1600 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 1400 1750 1400 1 0 0
+{
+T 1950 1400 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 1395 5 10 1 1 0 6 1
+pinlabel=I/O
+T 1845 1445 5 10 1 1 0 0 1
+pinnumber=21
+T 1950 1400 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 1200 1750 1200 1 0 0
+{
+T 1950 1200 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 1195 5 10 1 1 0 6 1
+pinlabel=I/O
+T 1845 1245 5 10 1 1 0 0 1
+pinnumber=20
+T 1950 1200 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 1000 1750 1000 1 0 0
+{
+T 1950 1000 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 995 5 10 1 1 0 6 1
+pinlabel=IO16
+T 1845 1045 5 10 1 1 0 0 1
+pinnumber=19
+T 1950 1000 5 10 0 0 0 0 1
+pinseq=0
+}
+P 150 1600 350 1600 1 0 0
+{
+T 150 1600 5 10 0 0 0 0 1
+pintype=unknown
+T 405 1595 5 10 1 1 0 0 1
+pinlabel=GOE
+T 255 1645 5 10 1 1 0 6 1
+pinnumber=33
+T 150 1600 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 2200 1750 2200 1 0 0
+{
+T 1950 2200 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 2195 5 10 1 1 0 6 1
+pinlabel=I/O
+T 1845 2245 5 10 1 1 0 0 1
+pinnumber=28
+T 1950 2200 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1950 700 1750 700 1 0 0
+{
+T 1950 700 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 695 5 10 1 1 0 6 1
+pinlabel=I
+T 1845 745 5 10 1 1 0 0 1
+pinnumber=18
+T 1950 700 5 10 0 0 0 0 1
+pinseq=0
+}
+P 750 0 750 200 1 0 0
+{
+T 750 0 5 10 0 0 0 0 1
+pintype=unknown
+T 505 250 5 10 1 1 0 0 1
+pinlabel=Vccio2
+T 795 150 5 10 1 1 180 6 1
+pinnumber=26
+T 750 0 5 10 0 0 0 0 1
+pinseq=0
+}
+P 1350 0 1350 200 1 0 0
+{
+T 1350 0 5 10 0 0 0 0 1
+pintype=unknown
+T 1205 250 5 10 1 1 0 0 1
+pinlabel=GND
+T 1395 150 5 10 1 1 180 6 1
+pinnumber=25
+T 1350 0 5 10 0 0 0 0 1
+pinseq=0
+}
+T 500 2800 8 10 1 1 0 0 1
+device=XC2C VQ44
+T 600 2600 8 10 1 1 0 0 1
+comment=I/O bank 2
+L 350 3000 350 200 3 0 0 0 -1 -1
+L 1750 200 1750 3000 3 0 0 0 -1 -1
+L 1750 3000 350 3000 3 0 0 0 -1 -1
+L 350 200 1750 200 3 0 0 0 -1 -1
+T 450 450 9 10 1 0 0 0 1
+Func. block 1
+P 1950 2400 1750 2400 1 0 0
+{
+T 1950 2400 5 10 0 0 0 0 1
+pintype=unknown
+T 1695 2395 5 10 1 1 0 6 1
+pinlabel=IO9
+T 1845 2445 5 10 1 1 0 0 1
+pinnumber=29
+T 1950 2400 5 10 0 0 0 0 1
+pinseq=0
+}
+T 750 700 8 10 1 1 0 0 1
+refdes=U?
