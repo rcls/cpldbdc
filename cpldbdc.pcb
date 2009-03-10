@@ -1,5 +1,5 @@
 # release: pcb 20081128
-# date:    Wed Mar 11 12:05:36 2009
+# date:    Wed Mar 11 12:12:17 2009
 # user:    rloader (Ralph Loader)
 # host:    ralphsVM
 
@@ -9,7 +9,7 @@ FileVersion[20070407]
 PCB["" 280000 200000]
 
 Grid[2500.000000 0 0 1]
-Cursor[0 0 6.000000]
+Cursor[0 200000 6.000000]
 PolyArea[200000000.000000]
 Thermal[0.500000]
 DRC[800 800 800 1000 1500 1000]
@@ -1097,12 +1097,12 @@ Element["onsolder" "do214" "D2" "unknown" 30000 55000 3000 2000 2 100 "auto"]
 
 Element["onsolder" "sot23-6" "U3" "unknown" 30000 32500 3000 0 3 100 "auto"]
 (
-	Pad[-5700 0 -4500 0 2700 200 2900 "1" "1" "onsolder,square"]
-	Pad[-5700 -3750 -4500 -3750 2700 200 2900 "2" "2" "onsolder,square"]
-	Pad[-5700 -7500 -4500 -7500 2700 200 2900 "3" "3" "onsolder,square"]
-	Pad[4500 -7500 5700 -7500 2700 200 2900 "4" "4" "onsolder,square,edge2"]
-	Pad[4500 -3750 5700 -3750 2700 200 2900 "5" "5" "onsolder,square,edge2"]
-	Pad[4500 0 5700 0 2700 200 2900 "6" "6" "onsolder,square,edge2"]
+	Pad[-5700 0 -4500 0 2700 4000 2900 "1" "1" "onsolder,square"]
+	Pad[-5700 -3750 -4500 -3750 2700 4000 2900 "2" "2" "onsolder,square"]
+	Pad[-5700 -7500 -4500 -7500 2700 4000 2900 "3" "3" "onsolder,square"]
+	Pad[4500 -7500 5700 -7500 2700 4000 2900 "4" "4" "onsolder,square,edge2"]
+	Pad[4500 -3750 5700 -3750 2700 4000 2900 "5" "5" "onsolder,square,edge2"]
+	Pad[4500 0 5700 0 2700 4000 2900 "6" "6" "onsolder,square,edge2"]
 	ElementLine [2900 -9250 2900 1750 500]
 	ElementLine [-2900 -9250 2900 -9250 500]
 	ElementLine [-2900 -9250 -2900 1750 500]
@@ -1182,8 +1182,8 @@ Element["" "JUMPER6" "CONN4" "unknown" 250000 50000 5000 11000 2 100 ""]
 
 Element["" "T1.75_LED" "D5" "unknown" 260000 162500 2500 -5000 1 100 ""]
 (
-	Pin[0 0 7000 3000 6000 2800 "" "1" "square,edge2"]
-	Pin[10000 0 7000 3000 6000 2800 "" "2" "edge2"]
+	Pin[0 0 6000 3000 6000 2800 "" "1" "edge2"]
+	Pin[10000 0 6000 3000 6000 2800 "" "2" "edge2"]
 	ElementLine [12500 8300 13400 7400 1000]
 	ElementLine [12500 -8100 13500 -7100 1000]
 	ElementLine [13500 -7200 13500 7300 1000]
@@ -1193,8 +1193,8 @@ Element["" "T1.75_LED" "D5" "unknown" 260000 162500 2500 -5000 1 100 ""]
 
 Element["" "T1.75_LED" "D6" "unknown" 260000 137500 0 0 1 100 ""]
 (
-	Pin[0 0 7000 3000 6000 2800 "" "1" "square,edge2"]
-	Pin[10000 0 7000 3000 6000 2800 "" "2" "edge2"]
+	Pin[0 0 6000 3000 6000 2800 "" "1" "edge2"]
+	Pin[10000 0 6000 3000 6000 2800 "" "2" "edge2"]
 	ElementLine [12500 8300 13400 7400 1000]
 	ElementLine [12500 -8100 13500 -7100 1000]
 	ElementLine [13500 -7200 13500 7300 1000]
@@ -1204,8 +1204,8 @@ Element["" "T1.75_LED" "D6" "unknown" 260000 137500 0 0 1 100 ""]
 
 Element["" "T1.75_LED" "D3" "unknown" 260000 187500 2500 -2500 1 100 ""]
 (
-	Pin[0 0 7000 3000 6000 2800 "" "1" "square,edge2"]
-	Pin[10000 0 7000 3000 6000 2800 "" "2" "edge2"]
+	Pin[0 0 6000 3000 6000 2800 "" "1" "edge2"]
+	Pin[10000 0 6000 3000 6000 2800 "" "2" "edge2"]
 	ElementLine [12500 8300 13400 7400 1000]
 	ElementLine [12500 -8100 13500 -7100 1000]
 	ElementLine [13500 -7200 13500 7300 1000]
