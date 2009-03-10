@@ -1,5 +1,5 @@
 # release: pcb 20081128
-# date:    Wed Mar 11 11:22:02 2009
+# date:    Wed Mar 11 11:29:30 2009
 # user:    rloader (Ralph Loader)
 # host:    ralphsVM
 
@@ -9,12 +9,12 @@ FileVersion[20070407]
 PCB["" 280000 200000]
 
 Grid[2500.000000 0 0 1]
-Cursor[0 0 6.000000]
+Cursor[0 200000 6.000000]
 PolyArea[200000000.000000]
 Thermal[0.500000]
 DRC[800 800 800 1000 1500 1000]
-Flags("shownumber,rubberband,nameonpcb,autodrc,swapstartdir")
-Groups("1,2,3,s:4,5,6,c:s:c")
+Flags("shownumber,rubberband,nameonpcb,autodrc,swapstartdir,clearnew")
+Groups("1,2,3,s:4,5,6,c")
 Styles["Signal,1500,6000,2000,2000:Power,2000,6000,3500,1000:Fat,3000,6000,3500,2000:Skinny,900,3600,2000,1500"]
 
 Symbol(' ' 18)
