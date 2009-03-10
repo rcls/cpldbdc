@@ -50,7 +50,7 @@ pintype=unknown
 T 355 1395 5 10 1 1 0 0 1
 pinlabel=GOE
 T 205 1445 5 10 1 1 0 6 1
-pinnumber=32\
+pinnumber=32
 T 100 1400 5 10 0 0 0 0 1
 pinseq=0
 }
