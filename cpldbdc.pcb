@@ -1,5 +1,5 @@
 # release: pcb 20081128
-# date:    Wed Mar 11 13:05:49 2009
+# date:    Wed Mar 11 13:13:26 2009
 # user:    rloader (Ralph Loader)
 # host:    ralphsVM
 
@@ -9,13 +9,13 @@ FileVersion[20070407]
 PCB["" 280000 200000]
 
 Grid[2500.000000 0 0 1]
-Cursor[0 0 6.000000]
+Cursor[0 200000 6.000000]
 PolyArea[200000000.000000]
 Thermal[0.500000]
 DRC[800 800 800 1000 1500 1000]
 Flags("shownumber,rubberband,nameonpcb,autodrc,swapstartdir,clearnew")
 Groups("1,2,3,s:4,5,6,c")
-Styles["Signal,1500,6000,2000,2000:Power,2000,6000,3500,1000:Fat,5000,6000,3500,2500:Skinny,900,3600,2000,1500"]
+Styles["Signal,1500,6000,2000,2000:Power,2000,6000,3500,1000:Fat,5000,6000,3500,2500:Skinny,900,3600,2000,2000"]
 
 Symbol(' ' 18)
 (
@@ -981,58 +981,10 @@ Element["onsolder" "0603" "C13" "unknown" 27500 112500 -3000 0 3 100 "auto"]
 
 	)
 
-Element["onsolder" "LQFP44_10" "U2" "unknown" 207500 110000 -2000 6000 0 100 "auto"]
+Element["onsolder" "0603" "R2" "unknown" 195000 152500 -3150 -3150 1 100 "auto"]
 (
-	Pad[-25898 15748 -20972 15748 1574 3000 1874 "1" "1" "onsolder,square"]
-	Pad[-25898 12599 -20972 12599 1574 3000 1874 "2" "2" "onsolder,square"]
-	Pad[-25898 9449 -20972 9449 1574 3000 1874 "3" "3" "onsolder,square"]
-	Pad[-25898 6300 -20972 6300 1574 3000 1874 "4" "4" "onsolder,square"]
-	Pad[-25898 3150 -20972 3150 1574 3000 1874 "5" "5" "onsolder,square"]
-	Pad[-25898 0 -20972 0 1574 3000 1874 "6" "6" "onsolder,square"]
-	Pad[-25898 -3149 -20972 -3149 1574 3000 1874 "7" "7" "onsolder,square"]
-	Pad[-25898 -6299 -20972 -6299 1574 3000 1874 "8" "8" "onsolder,square"]
-	Pad[-25898 -9448 -20972 -9448 1574 3000 1874 "9" "9" "onsolder,square"]
-	Pad[-25898 -12598 -20972 -12598 1574 3000 1874 "10" "10" "onsolder,square"]
-	Pad[-25898 -15748 -20972 -15748 1574 3000 1874 "11" "11" "onsolder,square"]
-	Pad[-15748 -25898 -15748 -20972 1574 3000 1874 "12" "12" "onsolder,square,octagon"]
-	Pad[-12599 -25898 -12599 -20972 1574 3000 1874 "13" "13" "onsolder,square,octagon"]
-	Pad[-9449 -25898 -9449 -20972 1574 3000 1874 "14" "14" "onsolder,square,octagon"]
-	Pad[-6300 -25898 -6300 -20972 1574 3000 1874 "15" "15" "onsolder,square,octagon"]
-	Pad[-3150 -25898 -3150 -20972 1574 3000 1874 "16" "16" "onsolder,square,octagon"]
-	Pad[0 -25898 0 -20972 1574 3000 1874 "17" "17" "onsolder,square,octagon"]
-	Pad[3149 -25898 3149 -20972 1574 3000 1874 "18" "18" "onsolder,square,octagon"]
-	Pad[6299 -25898 6299 -20972 1574 3000 1874 "19" "19" "onsolder,square,octagon"]
-	Pad[9448 -25898 9448 -20972 1574 3000 1874 "20" "20" "onsolder,square,octagon"]
-	Pad[12598 -25898 12598 -20972 1574 3000 1874 "21" "21" "onsolder,square,octagon"]
-	Pad[15748 -25898 15748 -20972 1574 3000 1874 "22" "22" "onsolder,square,octagon"]
-	Pad[20972 -15748 25898 -15748 1574 3000 1874 "23" "23" "onsolder,square,edge2"]
-	Pad[20972 -12599 25898 -12599 1574 3000 1874 "24" "24" "onsolder,square,edge2"]
-	Pad[20972 -9449 25898 -9449 1574 3000 1874 "25" "25" "onsolder,square,edge2"]
-	Pad[20972 -6300 25898 -6300 1574 3000 1874 "26" "26" "onsolder,square,edge2"]
-	Pad[20972 -3150 25898 -3150 1574 3000 1874 "27" "27" "onsolder,square,edge2"]
-	Pad[20972 0 25898 0 1574 3000 1874 "28" "28" "onsolder,square,edge2"]
-	Pad[20972 3149 25898 3149 1574 3000 1874 "29" "29" "onsolder,square,edge2"]
-	Pad[20972 6299 25898 6299 1574 3000 1874 "30" "30" "onsolder,square,edge2"]
-	Pad[20972 9448 25898 9448 1574 3000 1874 "31" "31" "onsolder,square,edge2"]
-	Pad[20972 12598 25898 12598 1574 3000 1874 "32" "32" "onsolder,square,edge2"]
-	Pad[20972 15748 25898 15748 1574 3000 1874 "33" "33" "onsolder,square,edge2"]
-	Pad[15748 20972 15748 25898 1574 3000 1874 "34" "34" "onsolder,square,octagon,edge2"]
-	Pad[12599 20972 12599 25898 1574 3000 1874 "35" "35" "onsolder,square,octagon,edge2"]
-	Pad[9449 20972 9449 25898 1574 3000 1874 "36" "36" "onsolder,square,octagon,edge2"]
-	Pad[6300 20972 6300 25898 1574 3000 1874 "37" "37" "onsolder,square,octagon,edge2"]
-	Pad[3150 20972 3150 25898 1574 3000 1874 "38" "38" "onsolder,square,octagon,edge2"]
-	Pad[0 20972 0 25898 1574 3000 1874 "39" "39" "onsolder,square,octagon,edge2"]
-	Pad[-3149 20972 -3149 25898 1574 3000 1874 "40" "40" "onsolder,square,octagon,edge2"]
-	Pad[-6299 20972 -6299 25898 1574 3000 1874 "41" "41" "onsolder,square,octagon,edge2"]
-	Pad[-9448 20972 -9448 25898 1574 3000 1874 "42" "42" "onsolder,square,octagon,edge2"]
-	Pad[-12598 20972 -12598 25898 1574 3000 1874 "43" "43" "onsolder,square,octagon,edge2"]
-	Pad[-15748 20972 -15748 25898 1574 3000 1874 "44" "44" "onsolder,square,octagon,edge2"]
-	ElementLine [-16385 19285 19285 19285 800]
-	ElementLine [19285 19285 19285 -19285 800]
-	ElementLine [19285 -19285 -19285 -19285 800]
-	ElementLine [-19285 -19285 -19285 16385 800]
-	ElementLine [-19285 16385 -16385 19285 800]
-	ElementArc [-16385 16385 1000 1000 0 360 800]
+	Pad[-492 -2559 492 -2559 2952 2000 3552 "1" "1" "onsolder,square"]
+	Pad[-492 2559 492 2559 2952 2000 3552 "2" "2" "onsolder,square"]
 
 	)
 
@@ -1239,6 +1191,61 @@ Element["" "JUMPER6" "CONN4" "unknown" 250000 52500 5000 11000 2 100 ""]
 	ElementLine [-5000 5000 5000 5000 1000]
 
 	)
+
+Element["onsolder" "LQFP44_10" "U2" "unknown" 207500 110000 -2000 6000 0 100 "auto"]
+(
+	Pad[-25898 15748 -20972 15748 1574 3000 1874 "1" "1" "onsolder,square"]
+	Pad[-25898 12599 -20972 12599 1574 3000 1874 "2" "2" "onsolder,square"]
+	Pad[-25898 9449 -20972 9449 1574 3000 1874 "3" "3" "onsolder,square"]
+	Pad[-25898 6300 -20972 6300 1574 3000 1874 "4" "4" "onsolder,square"]
+	Pad[-25898 3150 -20972 3150 1574 3000 1874 "5" "5" "onsolder,square"]
+	Pad[-25898 0 -20972 0 1574 3000 1874 "6" "6" "onsolder,square"]
+	Pad[-25898 -3149 -20972 -3149 1574 3000 1874 "7" "7" "onsolder,square"]
+	Pad[-25898 -6299 -20972 -6299 1574 3000 1874 "8" "8" "onsolder,square"]
+	Pad[-25898 -9448 -20972 -9448 1574 3000 1874 "9" "9" "onsolder,square"]
+	Pad[-25898 -12598 -20972 -12598 1574 3000 1874 "10" "10" "onsolder,square"]
+	Pad[-25898 -15748 -20972 -15748 1574 3000 1874 "11" "11" "onsolder,square"]
+	Pad[-15748 -25898 -15748 -20972 1574 3000 1874 "12" "12" "onsolder,square,octagon"]
+	Pad[-12599 -25898 -12599 -20972 1574 3000 1874 "13" "13" "onsolder,square,octagon"]
+	Pad[-9449 -25898 -9449 -20972 1574 3000 1874 "14" "14" "onsolder,square,octagon"]
+	Pad[-6300 -25898 -6300 -20972 1574 3000 1874 "15" "15" "onsolder,square,octagon"]
+	Pad[-3150 -25898 -3150 -20972 1574 3000 1874 "16" "16" "onsolder,square,octagon"]
+	Pad[0 -25898 0 -20972 1574 3000 1874 "17" "17" "onsolder,square,octagon"]
+	Pad[3149 -25898 3149 -20972 1574 3000 1874 "18" "18" "onsolder,square,octagon"]
+	Pad[6299 -25898 6299 -20972 1574 3000 1874 "19" "19" "onsolder,square,octagon"]
+	Pad[9448 -25898 9448 -20972 1574 3000 1874 "20" "20" "onsolder,square,octagon"]
+	Pad[12598 -25898 12598 -20972 1574 3000 1874 "21" "21" "onsolder,square,octagon"]
+	Pad[15748 -25898 15748 -20972 1574 3000 1874 "22" "22" "onsolder,square,octagon"]
+	Pad[20972 -15748 25898 -15748 1574 3000 1874 "23" "23" "onsolder,square,edge2"]
+	Pad[20972 -12599 25898 -12599 1574 3000 1874 "24" "24" "onsolder,square,edge2"]
+	Pad[20972 -9449 25898 -9449 1574 3000 1874 "25" "25" "onsolder,square,edge2"]
+	Pad[20972 -6300 25898 -6300 1574 3000 1874 "26" "26" "onsolder,square,edge2"]
+	Pad[20972 -3150 25898 -3150 1574 3000 1874 "27" "27" "onsolder,square,edge2"]
+	Pad[20972 0 25898 0 1574 3000 1874 "28" "28" "onsolder,square,edge2"]
+	Pad[20972 3149 25898 3149 1574 3000 1874 "29" "29" "onsolder,square,edge2"]
+	Pad[20972 6299 25898 6299 1574 3000 1874 "30" "30" "onsolder,square,edge2"]
+	Pad[20972 9448 25898 9448 1574 3000 1874 "31" "31" "onsolder,square,edge2"]
+	Pad[20972 12598 25898 12598 1574 3000 1874 "32" "32" "onsolder,square,edge2"]
+	Pad[20972 15748 25898 15748 1574 3000 1874 "33" "33" "onsolder,square,edge2"]
+	Pad[15748 20972 15748 25898 1574 3000 1874 "34" "34" "onsolder,square,octagon,edge2"]
+	Pad[12599 20972 12599 25898 1574 3000 1874 "35" "35" "onsolder,square,octagon,edge2"]
+	Pad[9449 20972 9449 25898 1574 3000 1874 "36" "36" "onsolder,square,octagon,edge2"]
+	Pad[6300 20972 6300 25898 1574 3000 1874 "37" "37" "onsolder,square,octagon,edge2"]
+	Pad[3150 20972 3150 25898 1574 3000 1874 "38" "38" "onsolder,square,octagon,edge2"]
+	Pad[0 20972 0 25898 1574 3000 1874 "39" "39" "onsolder,square,octagon,edge2"]
+	Pad[-3149 20972 -3149 25898 1574 3000 1874 "40" "40" "onsolder,square,octagon,edge2"]
+	Pad[-6299 20972 -6299 25898 1574 3000 1874 "41" "41" "onsolder,square,octagon,edge2"]
+	Pad[-9448 20972 -9448 25898 1574 3000 1874 "42" "42" "onsolder,square,octagon,edge2"]
+	Pad[-12598 20972 -12598 25898 1574 3000 1874 "43" "43" "onsolder,square,octagon,edge2"]
+	Pad[-15748 20972 -15748 25898 1574 3000 1874 "44" "44" "onsolder,square,octagon,edge2"]
+	ElementLine [-16385 19285 19285 19285 800]
+	ElementLine [19285 19285 19285 -19285 800]
+	ElementLine [19285 -19285 -19285 -19285 800]
+	ElementLine [-19285 -19285 -19285 16385 800]
+	ElementLine [-19285 16385 -16385 19285 800]
+	ElementArc [-16385 16385 1000 1000 0 360 800]
+
+	)
 Layer(1 "solder")
 (
 	Line[210650 135898 210650 179350 900 4000 "clearline,rubberend"]
@@ -1415,6 +1422,15 @@ Layer(1 "solder")
 	Line[225000 37500 230000 32500 1500 4000 "clearline"]
 	Line[235000 62500 235000 37500 1500 4000 "clearline"]
 	Line[235000 37500 240000 32500 1500 4000 "clearline"]
+	Line[194902 135898 194902 142598 900 4000 "clearline"]
+	Line[194902 142598 190000 147500 900 4000 "clearline"]
+	Line[190000 147500 190000 157500 900 4000 "clearline"]
+	Line[190000 157500 192500 160000 900 4000 "clearline"]
+	Line[198052 135898 197500 136450 900 4000 "clearline"]
+	Line[195000 157500 192500 160000 900 4000 "clearline"]
+	Line[195000 147500 195000 157500 900 4000 "clearline"]
+	Line[198052 135898 198052 144448 900 4000 "clearline"]
+	Line[198052 144448 195000 147500 900 4000 "clearline"]
 	Polygon("clearpoly")
 	(
 		[95000 17500] [37500 17500] [37500 82500] [95000 82500] 
@@ -1860,46 +1876,53 @@ NetList()
 	)
 	Net("unnamed_net33" "(unknown)")
 	(
+		Connect("R2-1")
+		Connect("R2-2")
+		Connect("U2-42")
+		Connect("U2-43")
+	)
+	Net("unnamed_net34" "(unknown)")
+	(
 		Connect("U2-12")
 		Connect("U5-14")
 	)
-	Net("unnamed_net34" "(unknown)")
+	Net("unnamed_net35" "(unknown)")
 	(
 		Connect("U2-13")
 		Connect("U5-15")
 	)
-	Net("unnamed_net35" "(unknown)")
+	Net("unnamed_net36" "(unknown)")
 	(
 		Connect("U2-14")
 		Connect("U5-16")
 	)
-	Net("unnamed_net36" "(unknown)")
+	Net("unnamed_net37" "(unknown)")
 	(
 		Connect("U2-16")
 		Connect("U5-13")
 	)
-	Net("unnamed_net37" "(unknown)")
+	Net("unnamed_net38" "(unknown)")
 	(
 		Connect("CONN1-1")
 		Connect("D1-1")
 	)
-	Net("unnamed_net38" "(unknown)")
+	Net("unnamed_net39" "(unknown)")
 	(
 		Connect("CONN2-6")
 		Connect("CONN3-6")
 		Connect("J2-1")
 	)
-	Net("unnamed_net39" "(unknown)")
+	Net("unnamed_net40" "(unknown)")
 	(
 		Connect("D5-1")
 		Connect("R3-2")
 	)
-	Net("unnamed_net40" "(unknown)")
+	Net("unnamed_net41" "(unknown)")
 	(
 		Connect("D3-1")
 		Connect("R1-2")
 	)
-	Net("unnamed_net41" "(unknown)")
+	Net("unnamed_net42" "(unknown)")
 	(
 		Connect("D6-1")
 		Connect("R4-2")
