@@ -19,7 +19,7 @@ end bdc;
 
 architecture Behavioral of bdc is
   signal count : std_logic_vector (3 downto 0) := x"0";
-  signal counthi : std_logic_vector (5 downto 0) := "000000";
+  signal counthi : std_logic_vector (3 downto 0) := x"0";
   signal data : std_logic_vector (3 downto 0) := x"0";
 
   type state_t is (send_bits, read_bits, long_break,
@@ -62,7 +62,8 @@ begin
   end process;
 
   process (Clk_main)
-    variable finish : boolean;
+    variable ack : boolean;
+    variable command : boolean;
     variable do_bits : boolean;
   begin
     if Clk_main'event then
@@ -93,49 +94,54 @@ begin
       -- correct if we stop a break on the same cycle as counthi increments.
       if do_bits or state = long_break or state = read_break then
         if count = x"0" then
-          counthi <= counthi + "01";
+          counthi <= counthi + '1';
         end if;
       end if;
 
       -- During a break, maintain the 6 bit counter, BDC data, and switch
       -- to waiting for break reply.
       if state = long_break then
-        if count = x"F" and counthi = "011111" then
+        if count = x"F" and counthi = x"7" then
           BDC <= '1';
-        elsif counthi(5) = '0' then
+        elsif counthi(3) = '0' then
           BDC <= '0';
         else
           BDC <= 'Z';
         end if;
 
-        if counthi(5) = '1' and BDC = '0' then
+        if counthi(3) = '1' and BDC = '0' then
           count <= x"0";
-          counthi <= "111111";
+          counthi <= x"F";
           state <= read_break;
         end if;
       end if;
 
-      -- In read break, we're waiting for a BDC=1; also breaks time out.
-      if (state = read_break and BDC = '1')
-        or ((state = long_break or state = read_break)
-            and count = x"F" and counthi = "111111") then
+      -- In read break, we're waiting for a BDC=1.
+      if state = read_break and BDC = '1' then
         data <= count;
-        state <= acknowledge;
+        state <= idle;
       end if;
 
-      -- BDC sampling cycle.
+      -- BDC sampling cycle.  During long_break, shift 1s into data, so
+      -- it ends up all 1s.
       if count = x"A" and do_bits then
-        data <= data(2 downto 0) & BDC;
+        if do_bits then
+          data <= data(2 downto 0) & BDC;
+        elsif state = read_break then
+          data <= data(2 downto 0) & '1';
+        end if;
       end if;
 
       -- Check if we are finishing this command & can read another.
-      finish :=
+      ack :=
         (do_bits and counthi(2 downto 0) = "11")
-        or state = acknowledge
-        or state = idle;
+        or state = acknowledge;
+      command :=
+        ack or state = idle or
+        ((state = long_break or state = read_break) and counthi = x"F");
 
       -- Send data at the end of each command.
-      if count = x"C" and finish and state /= idle then
+      if count = x"C" and ack then
         WRint <= '1';
 --        DQ <= x"3" & data;
 --      else
@@ -143,33 +149,30 @@ begin
       end if;
 
       -- Ask for next command if we want data and its available.
-      if count = x"E" and finish and RXFi = '0' then
+      if count = x"E" and command and RXFi = '0' then
         RDiInt <= '0';
       end if;
 
       -- Process command, or go to idle if no command.
-      if count = x"F" and finish then
+      if count = x"F" and command then
         data <= "XXXX";
         if RDiInt /= '0' then
           state <= idle;
           data <= data;
         elsif DQ(7 downto 4) = x"4" then
           state <= send_bits;
-          counthi <= "XXX111";
+          counthi <= "XX11";
           data <= DQ(3 downto 0);
         elsif DQ(7 downto 4) = x"6" then
           state <= read_bits;
-          counthi <= "XXX111";
+          counthi <= "XX11";
         elsif DQ(7 downto 0) = x"21" then
           state <= long_break;
-          counthi <= "111111";
-        elsif DQ(7 downto 0) = x"30" then
+          counthi <= "1111";
+        elsif DQ(7 downto 0) = x"3D" then
           state <= acknowledge;
           data <= counthi(3 downto 0);
-        elsif DQ(7 downto 0) = x"31" then
-          state <= long_break;
-          data <= "00" & counthi(5 downto 4);
-        elsif DQ(7 downto 2) = "001101" then
+        elsif DQ(7 downto 2) = "001100" then
           state <= acknowledge;
           clkspeed <= DQ(1 downto 0);
           --data <= "00" & clkspeed;
