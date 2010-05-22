@@ -64,8 +64,6 @@ begin
 
   process (Clk_main)
     variable do_bits : boolean;
-    variable run_hi : boolean;
-    variable command : boolean;
   begin
     if Clk_main'event then
       WRint <= '0';
@@ -93,8 +91,7 @@ begin
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
       -- correct if we finish a sync on the same clock as counthi increments.
-      run_hi := do_bits or state = sync_init or state = sync_low;
-      if count = x"0" and run_hi then
+      if count = x"0" and state /= ack and state /= idle then
         counthi <= counthi + '1';
       end if;
 
