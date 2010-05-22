@@ -127,7 +127,6 @@ begin
       -- Send data at the end of the do_bits and ack commands.
       if count = x"C" and ((counthi = STOP and do_bits) or state = ack) then
         WRint <= '1';
-        state <= idle;
       end if;
 
       -- Ask for next command if we want data and its available.
@@ -136,7 +135,9 @@ begin
       end if;
 
       -- Process command, or stay in idle if no command.
-      if RDiInt = '0' then
+      if WRint = '1' then
+        state <= idle;
+      elsif RDiInt = '0' then
         if DQ(7 downto 4) = x"4" then
           state <= send_bits;
           data <= DQ(3 downto 0);
