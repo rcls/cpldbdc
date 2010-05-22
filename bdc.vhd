@@ -14,16 +14,16 @@ entity bdc is
         RDi : out  STD_LOGIC;
         WR : out STD_LOGIC;
         BDC : inout  STD_LOGIC := 'Z';
+        IO : inout std_logic_vector(2 downto 0) := "ZZZ";
         Clk : in std_logic);
 end bdc;
 
 architecture Behavioral of bdc is
   signal count : std_logic_vector (3 downto 0) := x"0";
-  signal counthi : std_logic_vector (3 downto 0) := x"0";
-  signal data : std_logic_vector (3 downto 0) := x"0";
+  signal counthi : std_logic_vector (4 downto 0);
+  signal data : std_logic_vector (3 downto 0);
 
-  type state_t is (send_bits, read_bits, long_break,
-                   read_break, acknowledge, idle);
+  type state_t is (ack, idle, send_bits, read_bits, sync_init, sync_low);
 
   signal state : state_t := idle;
 
@@ -62,9 +62,9 @@ begin
   end process;
 
   process (Clk_main)
-    variable ack : boolean;
-    variable command : boolean;
     variable do_bits : boolean;
+    variable run_hi : boolean;
+    variable command : boolean;
   begin
     if Clk_main'event then
       WRint <= '0';
@@ -91,62 +91,42 @@ begin
       end case;
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
-      -- correct if we stop a break on the same cycle as counthi increments.
-      if do_bits or state = long_break or state = read_break then
-        if count = x"0" then
-          counthi <= counthi + '1';
-        end if;
+      -- correct if we finish a sync on the same clock as counthi increments.
+      run_hi := do_bits or state = sync_init or state = sync_low;
+      if count = x"0" and run_hi then
+        counthi <= counthi + '1';
       end if;
 
-      -- During a break, maintain the 6 bit counter, BDC data, and switch
-      -- to waiting for break reply.
-      if state = long_break then
-        if count = x"F" and counthi = x"7" then
+      -- Send sync, with a one-clock speedup.
+      if state = sync_init and counthi(4) = '0' then
+        if counthi(3 downto 0) = x"F" and count = x"F" then
           BDC <= '1';
-        elsif counthi(3) = '0' then
-          BDC <= '0';
         else
-          BDC <= 'Z';
-        end if;
-
-        if counthi(3) = '1' and BDC = '0' then
-          count <= x"0";
-          counthi <= x"F";
-          state <= read_break;
+          BDC <= '0';
         end if;
       end if;
 
-      -- In read break, we're waiting for a BDC=1.
-      if state = read_break and BDC = '1' then
+      -- In read sync, we're waiting for a BDC 0-to-1 transition.
+      if state = sync_init and counthi(4) = '1' and BDC = '0' then
+        state <= sync_low;
+      end if;
+      if state = sync_low and BDC = '1' then
         data <= count;
         state <= idle;
+--        state <= sync_init;
       end if;
 
-      -- BDC sampling cycle.  During long_break, shift 1s into data, so
-      -- it ends up all 1s.
+      -- BDC sampling cycle.
       if count = x"A" and do_bits then
-        if do_bits then
-          data <= data(2 downto 0) & BDC;
-        elsif state = read_break then
-          data <= data(2 downto 0) & '1';
-        end if;
+        data <= data(2 downto 0) & BDC;
       end if;
 
-      -- Check if we are finishing this command & can read another.
-      ack :=
-        (do_bits and counthi(2 downto 0) = "11")
-        or state = acknowledge;
-      command :=
-        ack or state = idle or
-        ((state = long_break or state = read_break) and counthi = x"F");
-
-      -- Send data at the end of each command.
-      if count = x"C" and ack then
+      -- Send data at the end of the do_bits and ack commands.
+      if count = x"C" and counthi = "11111" and (do_bits or state = ack) then
         WRint <= '1';
---        DQ <= x"3" & data;
---      else
---        DQ <= "ZZZZZZZZ";
       end if;
+
+      command := state = idle or state = ack or counthi = "11111";
 
       -- Ask for next command if we want data and its available.
       if count = x"E" and command and RXFi = '0' then
@@ -155,29 +135,50 @@ begin
 
       -- Process command, or go to idle if no command.
       if count = x"F" and command then
-        data <= "XXXX";
         if RDiInt /= '0' then
           state <= idle;
           data <= data;
+          counthi <= counthi;
         elsif DQ(7 downto 4) = x"4" then
           state <= send_bits;
-          counthi <= "XX11";
           data <= DQ(3 downto 0);
-        elsif DQ(7 downto 4) = x"6" then
+          counthi <= "11011";
+        elsif DQ(7 downto 4) = x"5" then
           state <= read_bits;
-          counthi <= "XX11";
-        elsif DQ(7 downto 0) = x"21" then
-          state <= long_break;
-          counthi <= "1111";
-        elsif DQ(7 downto 0) = x"3D" then
-          state <= acknowledge;
+          data <= "XXXX";
+          counthi <= "11011";
+        elsif DQ(7 downto 0) = x"21" then -- '!'
+          state <= sync_init;
+          data <= "1111";
+          counthi <= "11111";
+        elsif DQ(7 downto 0) = x"3F" then -- '?'
+          state <= ack;
           data <= counthi(3 downto 0);
+          counthi <= "XXXXX";
+        elsif DQ(7 downto 0) = x"3D" then -- '='
+          state <= ack;
+          data <= data;
+          counthi <= counthi;
         elsif DQ(7 downto 2) = "001100" then
-          state <= acknowledge;
+          state <= idle;
+          data <= "XXXX";
+          counthi <= "XXXXX";
           clkspeed <= DQ(1 downto 0);
-          --data <= "00" & clkspeed;
+        elsif DQ(7 downto 0) = x"3C" then -- '<'
+          state <= ack;
+          data <= '0' & IO;
+          counthi <= "XXXXX";
+        elsif DQ(7 downto 6) = "01" then
+          state <= idle;
+          data <= "XXXX";
+          counthi <= "XXXXX";
+          if DQ(3) = '1' then IO(0) <= DQ(0); else IO(0) <= 'Z'; end if;
+          if DQ(4) = '1' then IO(1) <= DQ(1); else IO(1) <= 'Z'; end if;
+          if DQ(5) = '1' then IO(2) <= DQ(2); else IO(2) <= 'Z'; end if;
         else
           state <= idle;
+          data <= "XXXX";
+          counthi <= "XXXXX";
         end if;
       end if;
     end if;
