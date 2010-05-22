@@ -134,7 +134,8 @@ begin
       -- Process command, or stay in idle if no command.
       if WRint = '1' then
         state <= idle;
-      elsif RDiInt = '0' then
+      end if;
+      if RDiInt = '0' then
         if DQ(7 downto 4) = x"4" then
           state <= send_bits;
           data <= DQ(3 downto 0);
