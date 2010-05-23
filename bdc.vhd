@@ -20,8 +20,8 @@ end bdc;
 
 architecture Behavioral of bdc is
   signal count : std_logic_vector (3 downto 0) := x"0";
-  signal counthi : std_logic_vector (4 downto 0);
-  signal data : std_logic_vector (3 downto 0);
+  signal counthi : std_logic_vector (4 downto 0) := "00000";
+  signal data : std_logic_vector (3 downto 0) := "0000";
 
   type state_t is (ack, idle, send_bits, read_bits, sync_init, sync_low,
                    read_command, write_result);
@@ -30,8 +30,8 @@ architecture Behavioral of bdc is
 
   signal clkspeed : std_logic_vector(1 downto 0) := "10";
 
-  signal clkdiv : std_logic_vector(1 downto 0);
-  signal Clk_main : std_logic;
+  signal clkdiv : std_logic_vector(1 downto 0) := "00";
+  signal Clk_main : std_logic := '0';
 
   constant STOP : std_logic_vector(4 downto 0) := "10011";
   -- 0,1,2,3 - send start pulse.
@@ -142,16 +142,15 @@ begin
           state <= send_bits;
           data <= DQ(3 downto 0);
           counthi <= STOP - 4;
-        elsif DQ(7 downto 4) = x"5" then
+        elsif DQ = x"23" then -- '#'
           state <= read_bits;
           counthi <= STOP - 4;
-        elsif DQ(7 downto 0) = x"21" then -- '!'
+        elsif DQ = x"21" then -- '!'
           state <= sync_init;
-          data <= "1111";
           counthi <= "11111";
-        elsif DQ(7 downto 2) = "001100" then
+        elsif DQ(7 downto 2) = "001100" then -- 0,1,2,3
           clkspeed <= DQ(1 downto 0);
-        elsif DQ(7 downto 0) = x"3C" then -- '<'
+        elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
           data <= '0' & IO;
         elsif DQ(7 downto 6) = "01" then
