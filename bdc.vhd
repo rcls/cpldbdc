@@ -72,18 +72,20 @@ begin
   process (Clk_main)
     variable do_bits : boolean;
     variable sync_done : boolean;
+    variable index : integer;
   begin
     if Clk_main'event then
       count <= count + x"1";
 
       do_bits := state = send_bits or state = read_bits;
+      index := conv_integer(counthi(1 downto 0) - STOP(1 downto 0));
 
       -- During a data cycle, do the BDC data.  During sync, drive low
       -- with one cycle speed up.
       if count = x"0" then
         BDCdata <= '0';
       elsif count = x"4" and state = send_bits then
-        BDCdata <= data(3);
+        BDCdata <= BDCdata xor data(index);
       elsif count = x"D" and state = send_bits then
         BDCdata <= '1';
       end if;
@@ -97,8 +99,8 @@ begin
       end if;
 
       -- BDC sampling cycle.
-      if count = x"A" and do_bits then
-        data <= data(2 downto 0) & BDC;
+      if count = x"A" and state = read_bits then
+        data(index) <= BDC;
       end if;
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
