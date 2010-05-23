@@ -24,7 +24,7 @@ architecture Behavioral of bdc is
   signal data : std_logic_vector (3 downto 0) := "0000";
 
   type state_t is (ack, idle, send_bits, read_bits,
-                   sync_init, sync_wait,
+                   sync_init, sync_gap, sync_wait,
                    read_command, write_result);
 
   signal state : state_t := idle;
@@ -33,10 +33,11 @@ architecture Behavioral of bdc is
 
   signal clkdiv : std_logic_vector(1 downto 0) := "00";
   signal Clk_main : std_logic := '0';
-  signal lastBDC : std_logic := '0';
 
   signal BDCdata : std_logic := '0';
   signal BDCout : boolean := false;
+
+  signal WRint : std_logic := '0';
 
   constant STOP : std_logic_vector(3 downto 0) := "0011";
   -- 0,1,2,3 - send start pulse.
@@ -51,8 +52,8 @@ begin
 
   RDi <= '0' when state = read_command else '1';
 
-  WR <= '1' when state = write_result else '0';
-  DQ <= counthi & data when state = write_result else "ZZZZZZZZ";
+  WR <= WRint;
+  DQ <= counthi & data when WRint = '1' else "ZZZZZZZZ";
 
   BDC <= BDCdata when BDCout else 'Z';
 
@@ -70,6 +71,7 @@ begin
 
   process (Clk_main)
     variable do_bits : boolean;
+    variable sync_done : boolean;
   begin
     if Clk_main'event then
       count <= count + x"1";
@@ -86,8 +88,14 @@ begin
         BDCdata <= '1';
       end if;
 
+      -- BDC out enable.
       BDCout <=  state = send_bits or state = sync_init or
         (state = read_bits and count(3 downto 2) = "00");
+
+      -- BDC sampling cycle.
+      if count = x"A" and do_bits then
+        data <= data(2 downto 0) & BDC;
+      end if;
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
       -- correct if we finish a sync on the same clock as counthi increments.
@@ -95,38 +103,35 @@ begin
         counthi <= counthi + '1';
       end if;
 
-      -- At the end of sync_init, transfer to sync_wait, do the BDC speed-up
-      -- pulse, and set-up lastBDC to stop false triggering on the first
-      -- cycle of sync_wait.
+      -- At the end of sync_init, transfer to sync_gap, do the BDC speed-up.
       if state = sync_init and counthi = x"F" and count = x"F" then
-        state <= sync_wait;
+        state <= sync_gap;
         BDCdata <= '1';
-        lastBDC <= '1';
-      else
-        lastBDC <= BDC;
       end if;
 
       -- In read sync, we're waiting for a BDC 0-to-1 transition & we also
       -- time out.
-      if state = sync_wait then
-        if (lastBDC = '0' and BDC = '1') or (counthi = x"F" and count = x"F")
-        then
-          data <= count;
-          state <= ack;
+      sync_done := ((state = sync_gap or state = sync_wait)
+                    and counthi = x"F" and count = x"F")
+                   or (state = sync_wait and BDC = '1');
+      if sync_done then
+        data <= count;
+        state <= ack;
 --        if counthi(3) = '0' then
 --          clkspeed <= clkspeed - 1;
 --        end if;
-        end if;
       end if;
 
-      -- BDC sampling cycle.
-      if count = x"A" and do_bits then
-        data <= data(2 downto 0) & BDC;
+      if BDC = '0' and state = sync_gap then
+        state <= sync_wait;
       end if;
 
       -- Send data at the end of the do_bits and ack commands.
       if count = x"C" and ((counthi = STOP and do_bits) or state = ack) then
-        state <= write_result;
+        state <= idle;
+        WRint <= '1';
+      else
+        WRint <= '0';
       end if;
 
       -- Ask for next command if we want data and its available.
@@ -135,11 +140,6 @@ begin
       end if;
 
       -- Process command, or stay in idle if no command.
-      if state = write_result then
-        state <= idle;
-        data <= "XXXX";
-        counthi <= "XXXX";
-      end if;
       if state = read_command then
         state <= idle;
         data <= "XXXX";
@@ -147,10 +147,10 @@ begin
         if DQ(7 downto 4) = x"4" then
           state <= send_bits;
           data <= DQ(3 downto 0);
-          counthi <= STOP - 4;
+          counthi <= STOP - "0100";
         elsif DQ = x"23" then -- '#'
           state <= read_bits;
-          counthi <= STOP - 4;
+          counthi <= STOP - "0100";
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
           counthi <= "1111";
