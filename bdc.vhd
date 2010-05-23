@@ -23,12 +23,10 @@ architecture Behavioral of bdc is
   signal counthi : std_logic_vector (4 downto 0);
   signal data : std_logic_vector (3 downto 0);
 
-  type state_t is (ack, idle, send_bits, read_bits, sync_init, sync_low);
+  type state_t is (ack, idle, send_bits, read_bits, sync_init, sync_low,
+                   read_command, write_result);
 
   signal state : state_t := idle;
-
-  signal RDiInt : std_logic := '1';
-  signal WRint : std_logic := '0';
 
   signal clkspeed : std_logic_vector(1 downto 0) := "10";
 
@@ -45,10 +43,11 @@ architecture Behavioral of bdc is
   -- 15 - read next command.
 
 begin
-  RDi <= RDiInt;
-  WR <= WRint;
 
-  DQ <= counthi(3 downto 0) & data when WRint = '1' else "ZZZZZZZZ";
+  RDi <= '0' when state = read_command else '1';
+
+  WR <= '1' when state = write_result else '0';
+  DQ <= counthi(3 downto 0) & data when state = write_result else "ZZZZZZZZ";
 
   process (Clk)
   begin
@@ -66,8 +65,6 @@ begin
     variable do_bits : boolean;
   begin
     if Clk_main'event then
-      WRint <= '0';
-      RDiInt <= '1';
       BDC <= 'Z';
       count <= count + x"1";
 
@@ -123,51 +120,44 @@ begin
 
       -- Send data at the end of the do_bits and ack commands.
       if count = x"C" and ((counthi = STOP and do_bits) or state = ack) then
-        WRint <= '1';
+        state <= write_result;
       end if;
 
       -- Ask for next command if we want data and its available.
       if count = x"E" and state = idle and RXFi = '0' then
-        RDiInt <= '0';
+        state <= read_command;
       end if;
 
       -- Process command, or stay in idle if no command.
-      if WRint = '1' then
+      if state = write_result then
         state <= idle;
+        data <= "XXXX";
+        counthi <= "XXXXX";
       end if;
-      if RDiInt = '0' then
+      if state = read_command then
+        state <= idle;
+        data <= "XXXX";
+        counthi <= "XXXXX";
         if DQ(7 downto 4) = x"4" then
           state <= send_bits;
           data <= DQ(3 downto 0);
           counthi <= STOP - 4;
         elsif DQ(7 downto 4) = x"5" then
           state <= read_bits;
-          data <= "XXXX";
           counthi <= STOP - 4;
         elsif DQ(7 downto 0) = x"21" then -- '!'
           state <= sync_init;
           data <= "1111";
           counthi <= "11111";
         elsif DQ(7 downto 2) = "001100" then
-          state <= idle;
-          data <= "XXXX";
-          counthi <= "XXXXX";
           clkspeed <= DQ(1 downto 0);
         elsif DQ(7 downto 0) = x"3C" then -- '<'
           state <= ack;
           data <= '0' & IO;
-          counthi <= "XXXXX";
         elsif DQ(7 downto 6) = "01" then
-          state <= idle;
-          data <= "XXXX";
-          counthi <= "XXXXX";
           if DQ(3) = '1' then IO(0) <= DQ(0); else IO(0) <= 'Z'; end if;
           if DQ(4) = '1' then IO(1) <= DQ(1); else IO(1) <= 'Z'; end if;
           if DQ(5) = '1' then IO(2) <= DQ(2); else IO(2) <= 'Z'; end if;
-        else
-          state <= idle;
-          data <= "XXXX";
-          counthi <= "XXXXX";
         end if;
       end if;
     end if;
