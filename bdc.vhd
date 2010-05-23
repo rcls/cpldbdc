@@ -97,7 +97,7 @@ begin
       end if;
 
       -- BDC sampling cycle.
-      if count = x"A" and do_bits then
+      if count = x"A" and state = read_bits then
         data <= data(2 downto 0) & BDC;
       end if;
 
