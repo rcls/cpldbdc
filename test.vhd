@@ -47,12 +47,11 @@ architecture behavior of test is
                      Clk  : in    std_logic);
   end component;
 
-  constant num_commands : integer := 10;
   subtype byte_t is std_logic_vector(7 downto 0);
-  type command_t is array(1 to num_commands) of byte_t;
+  type command_t is array(1 to 10) of byte_t;
 
   constant commands : command_t := (
-    x"33", x"45", x"45", x"23", x"23", x"20", x"21", x"00", x"00", x"00");
+    x"33", x"45", x"4A", x"23", x"23", x"20", x"21", x"00", x"00", x"00");
 
   --Inputs
   signal RXFi : std_logic := '1';
@@ -90,8 +89,8 @@ begin
   -- Stimulus process
   stim_proc: process
   begin
-    wait for 100ns;
-    for i in 1 to num_commands loop
+    wait for 101ns;
+    for i in 1 to 10 loop
       RXFi <= '0';
       wait until RDi = '0';
       wait for 10ns;

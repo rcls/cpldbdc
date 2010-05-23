@@ -24,8 +24,7 @@ architecture Behavioral of bdc is
   signal data : std_logic_vector (3 downto 0) := "0000";
 
   type state_t is (ack, idle, send_bits, read_bits,
-                   sync_init, sync_gap, sync_wait,
-                   read_command, write_result);
+                   sync_init, sync_gap, sync_wait);
 
   signal state : state_t := idle;
 
@@ -38,6 +37,7 @@ architecture Behavioral of bdc is
   signal BDCout : boolean := false;
 
   signal WRint : std_logic := '0';
+  signal RDiint : std_logic := '1';
 
   constant STOP : std_logic_vector(3 downto 0) := "0011";
   -- 0,1,2,3 - send start pulse.
@@ -50,7 +50,7 @@ architecture Behavioral of bdc is
 
 begin
 
-  RDi <= '0' when state = read_command else '1';
+  RDi <= RDiint;
 
   WR <= WRint;
   DQ <= counthi & data when WRint = '1' else "ZZZZZZZZ";
@@ -146,12 +146,13 @@ begin
 
       -- Ask for next command if we want data and its available.
       if count = x"E" and state = idle and RXFi = '0' then
-        state <= read_command;
+        RDiint <= '1';
+      else
+        RDiint <= '0';
       end if;
 
       -- Process command, or stay in idle if no command.
-      if state = read_command then
-        state <= idle;
+      if state = idle and RDiint = '1' then
         data <= "XXXX";
         counthi <= "XXXX";
         if DQ(7 downto 4) = x"4" then
