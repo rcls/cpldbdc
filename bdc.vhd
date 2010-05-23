@@ -80,7 +80,7 @@ begin
 
       -- During a data cycle, do the BDC data.  During sync, drive low
       -- with one cycle speed up.
-      if count = x"0" and (do_bits or state = sync_init) then
+      if count = x"0" then
         BDCdata <= '0';
       elsif count = x"4" and state = send_bits then
         BDCdata <= data(3);
@@ -89,8 +89,12 @@ begin
       end if;
 
       -- BDC out enable.
-      BDCout <=  state = send_bits or state = sync_init or
-        (state = read_bits and count(3 downto 2) = "00");
+      if count = x"0" then
+        BDCout <= do_bits or state = sync_init;
+      end if;
+      if count = x"4" and state = read_bits then
+        BDCout <= false;
+      end if;
 
       -- BDC sampling cycle.
       if count = x"A" and do_bits then
@@ -127,11 +131,17 @@ begin
       end if;
 
       -- Send data at the end of the do_bits and ack commands.
-      if count = x"C" and ((counthi = STOP and do_bits) or state = ack) then
+      if count = x"C" and ((counthi = STOP and state = read_bits)
+                           or state = ack) then
         state <= idle;
         WRint <= '1';
       else
         WRint <= '0';
+      end if;
+
+      -- Exit send bits at the right moment...
+      if count = x"D" and counthi = STOP and state = send_bits then
+        state <= idle;
       end if;
 
       -- Ask for next command if we want data and its available.
