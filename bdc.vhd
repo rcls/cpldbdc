@@ -45,7 +45,7 @@ architecture Behavioral of bdc is
   -- 10 - sample.
   -- 12 - write result (could do 10,11!).
   -- 13 - drive high for zero.
-  -- 14 - start read (could do 13,14!).
+  -- 14 - start command read (could do 13,14!).
   -- 15 - read next command.
 
 begin
@@ -78,7 +78,7 @@ begin
       count <= count + x"1";
 
       do_bits := state = send_bits or state = read_bits;
-      index := conv_integer(counthi(1 downto 0) - STOP(1 downto 0));
+      index := conv_integer(STOP(1 downto 0) - counthi(1 downto 0));
 
       -- During a data cycle, do the BDC data.  During sync, drive low
       -- with one cycle speed up.
@@ -146,15 +146,16 @@ begin
         state <= idle;
       end if;
 
-      -- Ask for next command if we want data and its available.
+      -- Ask for next command if we want data and it's available.
       if count = x"E" and state = idle and RXFi = '0' then
-        RDiint <= '1';
-      else
         RDiint <= '0';
+      else
+        RDiint <= '1';
       end if;
 
-      -- Process command, or stay in idle if no command.
-      if state = idle and RDiint = '1' then
+      -- Process command, or stay in idle if no command.  The 'state=idle'
+      -- is formally redundant but helps XST simplify things.
+      if state = idle and RDiint = '0' then
         data <= "XXXX";
         counthi <= "XXXX";
         if DQ(7 downto 4) = x"4" then
@@ -172,7 +173,7 @@ begin
         elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
           data <= '0' & IO;
-        elsif DQ(7 downto 6) = "01" then
+        elsif DQ(7 downto 6) = "10" then
           if DQ(3) = '1' then IO(0) <= DQ(0); else IO(0) <= 'Z'; end if;
           if DQ(4) = '1' then IO(1) <= DQ(1); else IO(1) <= 'Z'; end if;
           if DQ(5) = '1' then IO(2) <= DQ(2); else IO(2) <= 'Z'; end if;

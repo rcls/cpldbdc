@@ -1,30 +1,3 @@
---------------------------------------------------------------------------------
--- Company:
--- Engineer:
---
--- Create Date:   13:15:10 05/23/2010
--- Design Name:
--- Module Name:   /home/ralph/fpga/cpldbdc/test.vhd
--- Project Name:  cpldbdc
--- Target Device:
--- Tool versions:
--- Description:
---
--- VHDL Test Bench Created by ISE for module: bdc
---
--- Dependencies:
---
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
---
--- Notes:
--- This testbench has been automatically generated using types std_logic and
--- std_logic_vector for the ports of the unit under test.  Xilinx recommends
--- that these types always be used for the top-level I/O of a design in order
--- to guarantee that the testbench will bind correctly to the post-implementation
--- simulation model.
---------------------------------------------------------------------------------
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
@@ -51,7 +24,7 @@ architecture behavior of test is
   type command_t is array(1 to 10) of byte_t;
 
   constant commands : command_t := (
-    x"33", x"45", x"4A", x"23", x"23", x"20", x"21", x"00", x"00", x"00");
+    x"33", x"41", x"42", x"44", x"48", x"23", x"23", x"20", x"21", x"00");
 
   --Inputs
   signal RXFi : std_logic := '1';
@@ -68,13 +41,13 @@ architecture behavior of test is
 
 begin
 
-  uut: bdc port map (DQ => DQ,
+  uut: bdc port map (DQ   => DQ,
                      RXFi => RXFi,
-                     RDi => RDi,
-                     WR => WR,
-                     BDC => Z,
-                     IO => IO,
-                     Clk => Clk);
+                     RDi  => RDi,
+                     WR   => WR,
+                     BDC  => Z,
+                     IO   => IO,
+                     Clk  => Clk);
 
   -- Clock process definitions
   process
