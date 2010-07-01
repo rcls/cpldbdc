@@ -9,19 +9,19 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 --use UNISIM.VComponents.all;
 
 entity bdc is
-  Port (DQ : inout STD_LOGIC_VECTOR (7 downto 0);
-        RXFi : in  STD_LOGIC;
-        RDi : out  STD_LOGIC;
-        WR : out STD_LOGIC;
-        BDC : inout  STD_LOGIC := 'Z';
-        IO : inout std_logic_vector(2 downto 0) := "ZZZ";
-        Clk : in std_logic);
+  Port (DQ   : inout std_logic_vector (7 downto 0);
+        RXFi : in    std_logic;
+        RDi  :   out std_logic;
+        WR   :   out std_logic;
+        BDC  : inout std_logic := 'Z';
+        IO   : inout std_logic_vector(2 downto 0) := "ZZZ";
+        Clk  : in    std_logic);
 end bdc;
 
 architecture Behavioral of bdc is
-  signal count : std_logic_vector (3 downto 0) := x"0";
-  signal counthi : std_logic_vector (3 downto 0) := "0000";
-  signal data : std_logic_vector (3 downto 0) := "0000";
+  signal count   : std_logic_vector (3 downto 0) := x"0";
+  signal counthi : std_logic_vector (3 downto 0) := x"0";
+  signal data    : std_logic_vector (3 downto 0) := x"0";
 
   type state_t is (ack, idle, send_bits, read_bits,
                    sync_init, sync_gap, sync_wait);
@@ -32,6 +32,9 @@ architecture Behavioral of bdc is
 
   signal clkdiv : std_logic_vector(1 downto 0) := "00";
   signal Clk_main : std_logic := '0';
+
+  attribute bufg : string;
+  attribute bufg of Clk_main : signal is "CLK";
 
   signal BDCdata : std_logic := '0';
   signal BDCout : boolean := false;
