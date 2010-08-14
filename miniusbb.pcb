@@ -1,12 +1,12 @@
 # release: pcb 20091103
-# date:    Thu Jul  1 06:17:08 2010
+# date:    Fri Jul  2 23:34:17 2010
 # user:    ralph (Ralph Loader)
 # host:    i.geek.nz
 
 # To read pcb files, the pcb version (or the cvs source date) must be >= the file version
 FileVersion[20070407]
 
-PCB["" 78740 82677]
+PCB["" 55118 47244]
 
 Grid[196.850388 0 0 1]
 Cursor[0 0 0.000000]
@@ -798,7 +798,7 @@ Symbol('~' 12)
 	SymbolLine(20 35 25 30 8)
 )
 
-Element["" "MINIUSBB" "CONN?" "MINIUSBB" 39370 40157 -4331 22242 0 100 ""]
+Element["" "MINIUSBB" "CONN?" "MINIUSBB" 27559 4724 -4331 22242 0 100 ""]
 (
 	Pin[-8661 15552 5906 2000 6506 2500 "11" "11" "edge2"]
 	Pin[8661 15552 5906 2000 6506 2500 "12" "12" "edge2"]
@@ -852,18 +852,18 @@ Layer(9 "silk")
 )
 Layer(10 "silk")
 (
-	Line[39370 -197 39370 78543 236 1200 "clearline"]
-	Line[7874 40157 70866 40157 236 1200 "clearline"]
-	Line[7874 47638 70866 47638 236 1200 "clearline"]
-	Line[70866 65945 7874 65945 236 1200 "clearline"]
-	Line[56890 31496 56890 70866 236 1200 "clearline"]
-	Line[21850 31496 21850 70866 236 1200 "clearline"]
-	Line[70866 48819 7874 48819 236 1200 "clearline"]
-	Line[70866 61614 7874 61614 236 1200 "clearline"]
-	Line[70866 41339 7874 41339 236 1200 "clearline"]
-	Line[70866 70276 7874 70276 236 1200 "clearline"]
-	Line[70866 44488 7874 44488 236 1200 "clearline"]
-	Line[69488 78740 7874 78740 236 1200 "clearline"]
-	Line[70866 62795 7874 62795 236 1200 "clearline"]
-	Line[70866 69094 7874 69094 236 1200 "clearline"]
+	Line[27559 1969 27559 38386 236 1200 "clearline"]
+	Line[5709 4724 49409 4724 236 1200 "clearline"]
+	Line[5709 12205 49409 12205 236 1200 "clearline"]
+	Line[49409 30512 5709 30512 236 1200 "clearline"]
+	Line[45079 3740 45079 35433 236 1200 "clearline"]
+	Line[10039 3740 10039 35433 236 1200 "clearline"]
+	Line[49409 13386 5709 13386 236 1200 "clearline"]
+	Line[49409 26181 5709 26181 236 1200 "clearline"]
+	Line[49409 5906 5709 5906 236 1200 "clearline"]
+	Line[49409 34843 5709 34843 236 1200 "clearline"]
+	Line[49409 9055 5709 9055 236 1200 "clearline"]
+	Line[49409 43307 5709 43307 236 1200 "clearline"]
+	Line[49409 27362 5709 27362 236 1200 "clearline"]
+	Line[49409 33661 5709 33661 236 1200 "clearline"]
 )
