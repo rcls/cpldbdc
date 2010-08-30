@@ -111,7 +111,7 @@ begin
 
       -- BDC sampling cycle.
       if count = x"A" and state = read_bits then
-        data(index) <= BDC;
+        data(index) <= data(index) or BDC;
       end if;
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
@@ -133,7 +133,7 @@ begin
                    or (state = sync_wait and BDC = '1');
 
       if sync_done then
-        data <= count;
+        data <= data or count;
         state <= ack;
       end if;
       if BDC = '0' and state = sync_gap then
@@ -163,6 +163,12 @@ begin
         RDiint <= '1';
       end if;
 
+      -- Reset data before reading a command.  This simplifies setting of
+      -- data while reading a command.
+      if state = idle and RDiint = '1' then
+        data <= x"0";
+      end if;
+
       -- Process command, or stay in idle if no command.  The 'state=idle'
       -- is formally redundant but helps XST simplify things.
       if state = idle and RDiint = '0' then
@@ -170,16 +176,17 @@ begin
         counthi <= "XXXX";
         if DQ(7 downto 4) = x"4" then
           state <= send_bits;
-          data <= DQ(3 downto 0);
-          counthi <= STOP - "0100";
+          data <= data or (DQ(3 downto 0));
+          counthi <= STOP - x"4";
         elsif DQ = x"23" then -- '#'
           state <= read_bits;
-          counthi <= STOP - "0100";
+          data <= data;
+          counthi <= STOP - x"4";
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
           counthi <= "1111";
         elsif DQ = x"20" then -- ' '
-          data <= "00" & LEDval;
+          data(1 downto 0) <= data(1 downto 0) or LEDval;
           --LEDval <= LEDval + "01";
           state <= ack;
         elsif DQ(7 downto 2) = "001100" then -- 0,1,2,3
@@ -188,7 +195,7 @@ begin
           LEDval <= DQ(1 downto 0);
         elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
-          data <= '0' & IO;
+          data(2 downto 0) <= data(2 downto 0) or IO;
         elsif DQ(7 downto 6) = "10" then
           if DQ(3) = '1' then IO(0) <= DQ(0); else IO(0) <= 'Z'; end if;
           if DQ(4) = '1' then IO(1) <= DQ(1); else IO(1) <= 'Z'; end if;
