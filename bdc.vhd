@@ -15,6 +15,7 @@ entity bdc is
         WR   :   out std_logic;
         BDC  : inout std_logic := 'Z';
         IO   : inout std_logic_vector(2 downto 0) := "ZZZ";
+        LED  : out   std_logic_vector(1 downto 0);
         Clk  : in    std_logic);
 end bdc;
 
@@ -27,6 +28,9 @@ architecture Behavioral of bdc is
                    sync_init, sync_gap, sync_wait);
 
   signal state : state_t := idle;
+
+  attribute fsm_encoding : string;
+  attribute fsm_encoding of state : signal is "compact";
 
   signal clkspeed : std_logic_vector(1 downto 0) := "10";
 
@@ -41,6 +45,8 @@ architecture Behavioral of bdc is
 
   signal WRint : std_logic := '0';
   signal RDiint : std_logic := '1';
+
+  signal LEDval : std_logic_vector(1 downto 0) := "10";
 
   constant STOP : std_logic_vector(3 downto 0) := "0011";
   -- 0,1,2,3 - send start pulse.
@@ -59,6 +65,8 @@ begin
   DQ <= counthi & data when WRint = '1' else "ZZZZZZZZ";
 
   BDC <= BDCdata when BDCout else 'Z';
+
+  LED <= LEDval;
 
   process (Clk)
   begin
@@ -87,15 +95,15 @@ begin
       -- with one cycle speed up.
       if count = x"0" then
         BDCdata <= '0';
-      elsif count = x"4" and state = send_bits then
-        BDCdata <= BDCdata xor data(index);
+      elsif count = x"4" and state = send_bits and data(index) = '1' then
+        BDCdata <= '1';
       elsif count = x"D" and state = send_bits then
         BDCdata <= '1';
       end if;
 
       -- BDC out enable.
       if count = x"0" then
-        BDCout <= do_bits or state = sync_init;
+        BDCout <= do_bits or state = sync_init or LEDval(0) = '0';
       end if;
       if count = x"4" and state = read_bits then
         BDCout <= false;
@@ -123,16 +131,15 @@ begin
       sync_done := ((state = sync_gap or state = sync_wait)
                     and counthi = x"F" and count = x"F")
                    or (state = sync_wait and BDC = '1');
+
       if sync_done then
         data <= count;
         state <= ack;
---        if counthi(3) = '0' then
---          clkspeed <= clkspeed - 1;
---        end if;
       end if;
-
       if BDC = '0' and state = sync_gap then
         state <= sync_wait;
+        counthi <= x"f";
+        count <= x"0";
       end if;
 
       -- Send data at the end of the do_bits and ack commands.
@@ -171,8 +178,14 @@ begin
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
           counthi <= "1111";
+        elsif DQ = x"20" then -- ' '
+          data <= "00" & LEDval;
+          --LEDval <= LEDval + "01";
+          state <= ack;
         elsif DQ(7 downto 2) = "001100" then -- 0,1,2,3
           clkspeed <= DQ(1 downto 0);
+        elsif DQ(7 downto 2) = "001101" then
+          LEDval <= DQ(1 downto 0);
         elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
           data <= '0' & IO;
