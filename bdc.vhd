@@ -41,7 +41,7 @@ architecture Behavioral of bdc is
   attribute bufg of Clk_main : signal is "CLK";
 
   signal BDCdata : std_logic := '0';
-  signal BDCout : boolean := false;
+  signal BDCout : boolean := true;
 
   signal WRint : std_logic := '0';
   signal RDiint : std_logic := '1';
@@ -176,7 +176,7 @@ begin
         counthi <= "XXXX";
         if DQ(7 downto 4) = x"4" then
           state <= send_bits;
-          data <= data or (DQ(3 downto 0));
+          data <= data or DQ(3 downto 0);
           counthi <= STOP - x"4";
         elsif DQ = x"23" then -- '#'
           state <= read_bits;
@@ -185,10 +185,10 @@ begin
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
           counthi <= "1111";
-        elsif DQ = x"20" then -- ' '
-          data(1 downto 0) <= data(1 downto 0) or LEDval;
+--        elsif DQ = x"20" then -- ' '
+--          data(1 downto 0) <= data(1 downto 0) or LEDval;
           --LEDval <= LEDval + "01";
-          state <= ack;
+--          state <= ack;
         elsif DQ(7 downto 2) = "001100" then -- 0,1,2,3
           clkspeed <= DQ(1 downto 0);
         elsif DQ(7 downto 2) = "001101" then
