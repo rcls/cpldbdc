@@ -57,6 +57,11 @@ architecture Behavioral of bdc is
   -- 14 - start command read (could do 13,14!).
   -- 15 - read next command.
 
+--  signal read_end : boolean;
+  signal hex_alpha : boolean;
+  attribute keep : string;
+  attribute keep of hex_alpha : signal is "TRUE";
+
 begin
 
   RDi <= RDiint;
@@ -67,6 +72,9 @@ begin
   BDC <= BDCdata when BDCout else 'Z';
 
   LED <= LEDval;
+
+  hex_alpha <= counthi = STOP
+               and (data(3) and (data(2) or data(1))) = '1';
 
   process (Clk)
   begin
@@ -142,13 +150,23 @@ begin
         count <= x"0";
       end if;
 
-      -- Send data at the end of the do_bits and ack commands.
+      -- Send data at the end of the read_bits and ack commands.
       if count = x"C" and ((counthi = STOP and state = read_bits)
                            or state = ack) then
         state <= idle;
         WRint <= '1';
       else
         WRint <= '0';
+      end if;
+
+      if count = x"C" and state = read_bits and hex_alpha then
+        data(0) <= not data(0);
+        data(1) <= data(1) xor not data(0);
+        data(2) <= data(2) xor (not data(1) and not data(0));
+        data(3) <= not data(3);
+        -- 3 -> 6:
+        counthi(0) <= '0';
+        counthi(2) <= '1';
       end if;
 
       -- Exit send bits at the right moment...
@@ -174,9 +192,16 @@ begin
       if state = idle and RDiint = '0' then
         data <= "XXXX";
         counthi <= "XXXX";
-        if DQ(7 downto 4) = x"4" then
+        if DQ(7 downto 4) = x"3" then -- 0...9 & extras
           state <= send_bits;
           data <= data or DQ(3 downto 0);
+          counthi <= STOP - x"4";
+        elsif DQ(7 downto 4) = x"6" then -- a...f & extras
+          state <= send_bits;
+          data(0) <= data(0) or not DQ(0);
+          data(1) <= data(1) or (DQ(0) xor DQ(1));
+          data(2) <= data(2) or DQ(2) or (DQ(1) and DQ(0));
+          data(3) <= '1';
           counthi <= STOP - x"4";
         elsif DQ = x"23" then -- '#'
           state <= read_bits;
@@ -189,9 +214,9 @@ begin
 --          data(1 downto 0) <= data(1 downto 0) or LEDval;
           --LEDval <= LEDval + "01";
 --          state <= ack;
-        elsif DQ(7 downto 2) = "001100" then -- 0,1,2,3
+        elsif DQ(7 downto 2) = "010000" then -- @,A,B,C
           clkspeed <= DQ(1 downto 0);
-        elsif DQ(7 downto 2) = "001101" then
+        elsif DQ(7 downto 2) = "010001" then -- D,E,F,G
           LEDval <= DQ(1 downto 0);
         elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
