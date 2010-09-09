@@ -57,8 +57,9 @@ architecture Behavioral of bdc is
   -- 14 - start command read (could do 13,14!).
   -- 15 - read next command.
 
---  signal read_end : boolean;
   signal hex_alpha : boolean;
+  signal hex_in : boolean;
+
   attribute keep : string;
   attribute keep of hex_alpha : signal is "TRUE";
 
@@ -75,6 +76,7 @@ begin
 
   hex_alpha <= counthi = STOP
                and (data(3) and (data(2) or data(1))) = '1';
+  hex_in <= DQ(7 downto 4) = x"6" or DQ(7 downto 4) = x"3";
 
   process (Clk)
   begin
@@ -119,7 +121,7 @@ begin
 
       -- BDC sampling cycle.
       if count = x"A" and state = read_bits then
-        data(index) <= data(index) or BDC;
+        data(index) <= data(index) xor BDC;
       end if;
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
@@ -141,7 +143,7 @@ begin
                    or (state = sync_wait and BDC = '1');
 
       if sync_done then
-        data <= data or count;
+        data <= data xor count;
         state <= ack;
       end if;
       if BDC = '0' and state = sync_gap then
@@ -181,8 +183,8 @@ begin
         RDiint <= '1';
       end if;
 
-      -- Reset data before reading a command.  This simplifies setting of
-      -- data while reading a command.
+      -- Reset data before reading a command.  This simplifies setting of data
+      -- while reading a command.
       if state = idle and RDiint = '1' then
         data <= x"0";
       end if;
@@ -190,42 +192,36 @@ begin
       -- Process command, or stay in idle if no command.  The 'state=idle'
       -- is formally redundant but helps XST simplify things.
       if state = idle and RDiint = '0' then
-        data <= "XXXX";
-        counthi <= "XXXX";
+        counthi <= "1111";
+
         if DQ(7 downto 4) = x"3" then -- 0...9 & extras
-          state <= send_bits;
-          data <= data or DQ(3 downto 0);
-          counthi <= STOP - x"4";
+          data <= data xor DQ(3 downto 0);
         elsif DQ(7 downto 4) = x"6" then -- a...f & extras
-          state <= send_bits;
-          data(0) <= data(0) or not DQ(0);
-          data(1) <= data(1) or (DQ(0) xor DQ(1));
-          data(2) <= data(2) or DQ(2) or (DQ(1) and DQ(0));
+          data(0) <= data(0) xor not DQ(0);
+          data(1) <= data(1) xor DQ(0) xor DQ(1);
+          data(2) <= data(2) xor (DQ(2) or (DQ(1) and DQ(0)));
           data(3) <= '1';
-          counthi <= STOP - x"4";
         elsif DQ = x"23" then -- '#'
           state <= read_bits;
-          data <= data;
-          counthi <= STOP - x"4";
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
-          counthi <= "1111";
---        elsif DQ = x"20" then -- ' '
---          data(1 downto 0) <= data(1 downto 0) or LEDval;
-          --LEDval <= LEDval + "01";
---          state <= ack;
         elsif DQ(7 downto 2) = "010000" then -- @,A,B,C
           clkspeed <= DQ(1 downto 0);
         elsif DQ(7 downto 2) = "010001" then -- D,E,F,G
           LEDval <= DQ(1 downto 0);
         elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
-          data(2 downto 0) <= data(2 downto 0) or IO;
+          data(2 downto 0) <= data(2 downto 0) xor IO;
         elsif DQ(7 downto 6) = "10" then
           if DQ(3) = '1' then IO(0) <= DQ(0); else IO(0) <= 'Z'; end if;
           if DQ(4) = '1' then IO(1) <= DQ(1); else IO(1) <= 'Z'; end if;
           if DQ(5) = '1' then IO(2) <= DQ(2); else IO(2) <= 'Z'; end if;
         end if;
+
+        if hex_in then
+          state <= send_bits;
+        end if;
+
       end if;
     end if;
   end process;

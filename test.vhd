@@ -24,7 +24,7 @@ architecture behavior of test is
   type command_t is array(1 to 10) of byte_t;
 
   constant commands : command_t := (
-    x"33", x"37", x"41", x"42", x"44", x"48", x"23", x"23", x"20", x"21");
+    x"47", x"43", x"31", x"32", x"34", x"38", x"6a", x"23", x"23", x"20");
 
   --Inputs
   signal RXFi : std_logic := '1';
