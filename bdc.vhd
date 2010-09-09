@@ -200,7 +200,7 @@ begin
           data(0) <= data(0) xor not DQ(0);
           data(1) <= data(1) xor DQ(0) xor DQ(1);
           data(2) <= data(2) xor (DQ(2) or (DQ(1) and DQ(0)));
-          data(3) <= '1';
+          data(3) <= not data(3);
         elsif DQ = x"23" then -- '#'
           state <= read_bits;
         elsif DQ = x"21" then -- '!'
