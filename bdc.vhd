@@ -166,6 +166,7 @@ begin
         WRint <= '0';
       end if;
 
+      -- Convert the nibble we've just read to hex.
       if count = x"C" and state = read_bits and hex_alpha then
         data(0) <= not data(0);
         data(1) <= data(1) xor not data(0);

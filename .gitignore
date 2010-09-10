@@ -1,4 +1,8 @@
 *~
-ise/*
+ise
 \#*#
 *.log
+*.cmd
+*.net
+*.new.pcb
+*.ace
