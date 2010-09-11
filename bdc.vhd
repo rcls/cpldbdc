@@ -68,7 +68,7 @@ architecture Behavioral of bdc is
   attribute keep : string;
   attribute keep of hex_alpha : signal is "TRUE";
 
-  constant ACTlen : integer := 14;
+  constant ACTlen : integer := 13;
   signal ACTcnt : std_logic_vector(ACTlen - 1 downto 0);
   signal ACTidle : boolean;
 
@@ -255,20 +255,16 @@ begin
   LEDval(1) <= '1' when ACTidle else '0';
 
   -- the 8MHz clock gives a 16MHz edge rate; this is divided by 256 by
-  -- count & counthi, and then by 16384 by a separate counter to give aprox
-  -- 1/4 second activity pulse.
+  -- count & counthi, and then by 8192 by a separate counter to give aprox
+  -- 1/8 second activity pulse.
   process (Clk)
   begin
     if Clk'event then
-      -- Splitting out the low bit of the counter completely seems to get
-      -- better binaries out of ISE.
+      if counthi = x"0" and count = x"0" and not ACTidle then
+        ACTcnt <= ACTcnt + 1;
+      end if;
       if RDiint = '0' and ACTidle then
         ACTcnt(0) <= '1';
-      elsif counthi = x"0" and count = x"0" and not ACTidle then
-        ACTcnt(0) <= not ACTcnt(0);
-      end if;
-      if counthi = x"0" and count = x"0" and ACTcnt(0) = '1' then
-        ACTcnt(ACTlen - 1 downto 1) <= ACTcnt(ACTlen - 1 downto 1) + 1;
       end if;
     end if;
   end process;
