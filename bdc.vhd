@@ -45,6 +45,7 @@ architecture Behavioral of bdc is
 
   signal BDCdata : std_logic := '0';
   signal BDCout : boolean := true;
+  signal BDCsync : std_logic;
 
   signal WRint : std_logic := '0';
   signal RDiint : std_logic := '1';
@@ -145,6 +146,14 @@ begin
         BDCdata <= '1';
       end if;
 
+      -- We need a synchroniser bit on the BDC for the sync stuff.  Gate with
+      -- the state so we don't assassinate sync_gap.
+      if BDC = '0' and (state = sync_gap or state = sync_wait) then
+        BDCsync <= '0';
+      else
+        BDCsync <= '1';
+      end if;
+
       -- It's cheaper to maintain data to shadow counter rather than to transfer
       -- count to data later on.
       if state = sync_wait then
@@ -155,15 +164,15 @@ begin
       -- time out.
       sync_done := ((state = sync_gap or state = sync_wait)
                     and counthi = x"F" and count = x"F")
-                   or (state = sync_wait and BDC = '1');
+                   or (state = sync_wait and BDCsync = '1');
 
+      if BDCsync = '0' and state = sync_gap then
+        state <= sync_wait;
+        counthi <= x"F";
+        count <= x"0";
+      end if;
       if sync_done then
         state <= ack;
-      end if;
-      if BDC = '0' and state = sync_gap then
-        state <= sync_wait;
-        counthi <= x"f";
-        count <= x"0";
       end if;
 
       -- Send data at the end of the read_bits and ack commands.
@@ -183,7 +192,7 @@ begin
         data(3) <= not data(3);
         -- 3 -> 6:
         counthi(0) <= '0';
-        counthi(2) <= '1';
+        counthi(2) <= not counthi(2);
       end if;
 
       -- Exit send bits at the right moment...
@@ -220,6 +229,7 @@ begin
           state <= read_bits;
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
+          data <= not data;
         elsif DQ(7 downto 2) = "010000" then -- @,A,B,C
           clkspeed <= DQ(1 downto 0);
         elsif DQ(7 downto 1) = "0100010" then -- D,E
