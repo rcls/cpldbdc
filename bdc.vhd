@@ -136,6 +136,12 @@ begin
         BDCdata <= '1';
       end if;
 
+      -- It's cheaper to maintain data to shadow counter rather than to transfer
+      -- count to data later on.
+      if state = sync_wait and BDC = '0' then
+        data <= data + x"1";
+      end if;
+
       -- In read sync, we're waiting for a BDC 0-to-1 transition & we also
       -- time out.
       sync_done := ((state = sync_gap or state = sync_wait)
@@ -143,7 +149,6 @@ begin
                    or (state = sync_wait and BDC = '1');
 
       if sync_done then
-        data <= data xor count;
         state <= ack;
       end if;
       if BDC = '0' and state = sync_gap then
