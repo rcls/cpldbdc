@@ -24,6 +24,9 @@ architecture Behavioral of bdc is
   signal counthi : std_logic_vector (3 downto 0) := x"0";
   signal data    : std_logic_vector (3 downto 0) := x"0";
 
+  attribute reg : string;
+  attribute reg of data : signal is "tff";
+
   type state_t is (ack, idle, send_bits, read_bits,
                    sync_init, sync_gap, sync_wait);
 
@@ -49,6 +52,7 @@ architecture Behavioral of bdc is
   signal LEDval : std_logic_vector(1 downto 0) := "10";
 
   constant STOP : std_logic_vector(3 downto 0) := "0011";
+
   -- 0,1,2,3 - send start pulse.
   -- 4 - drive high for 1.
   -- 10 - sample.
@@ -62,6 +66,10 @@ architecture Behavioral of bdc is
 
   attribute keep : string;
   attribute keep of hex_alpha : signal is "TRUE";
+
+  constant ACTlen : integer := 14;
+  signal ACTcnt : std_logic_vector(ACTlen - 1 downto 0);
+  signal ACTidle : boolean;
 
 begin
 
@@ -78,6 +86,7 @@ begin
                and (data(3) and (data(2) or data(1))) = '1';
   hex_in <= DQ(7 downto 4) = x"6" or DQ(7 downto 4) = x"3";
 
+  -- The 8MHz input clock gets divided by 1, 2, 3 or 4 to generate Clk_main.
   process (Clk)
   begin
     if Clk'event then
@@ -126,7 +135,7 @@ begin
 
       -- Maintain the bit number.  Doing this on count=0 means counthi is
       -- correct if we finish a sync on the same clock as counthi increments.
-      if count = x"0" and state /= ack and state /= idle then
+      if count = x"0" and state /= ack then
         counthi <= counthi + '1';
       end if;
 
@@ -138,7 +147,7 @@ begin
 
       -- It's cheaper to maintain data to shadow counter rather than to transfer
       -- count to data later on.
-      if state = sync_wait and BDC = '0' then
+      if state = sync_wait then
         data <= data + x"1";
       end if;
 
@@ -213,8 +222,8 @@ begin
           state <= sync_init;
         elsif DQ(7 downto 2) = "010000" then -- @,A,B,C
           clkspeed <= DQ(1 downto 0);
-        elsif DQ(7 downto 2) = "010001" then -- D,E,F,G
-          LEDval <= DQ(1 downto 0);
+        elsif DQ(7 downto 1) = "0100010" then -- D,E
+          LEDval(0) <= DQ(0);
         elsif DQ(7 downto 0) = x"22" then -- '"'
           state <= ack;
           data(2 downto 0) <= data(2 downto 0) xor IO;
@@ -228,6 +237,28 @@ begin
           state <= send_bits;
         end if;
 
+      end if;
+    end if;
+  end process;
+
+  ACTidle <= ACTcnt = 0;
+  LEDval(1) <= '1' when ACTidle else '0';
+
+  -- the 8MHz clock gives a 16MHz edge rate; this is divided by 256 by
+  -- count & counthi, and then by 16384 by a separate counter to give aprox
+  -- 1/4 second activity pulse.
+  process (Clk)
+  begin
+    if Clk'event then
+      -- Splitting out the low bit of the counter completely seems to get
+      -- better binaries out of ISE.
+      if RDiint = '0' and ACTidle then
+        ACTcnt(0) <= '1';
+      elsif counthi = x"0" and count = x"0" and not ACTidle then
+        ACTcnt(0) <= not ACTcnt(0);
+      end if;
+      if counthi = x"0" and count = x"0" and ACTcnt(0) = '1' then
+        ACTcnt(ACTlen - 1 downto 1) <= ACTcnt(ACTlen - 1 downto 1) + 1;
       end if;
     end if;
   end process;
