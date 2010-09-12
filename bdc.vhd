@@ -13,16 +13,18 @@ entity bdc is
         RXFi : in    std_logic;
         RDi  :   out std_logic;
         WR   :   out std_logic;
-        BDC  : inout std_logic := 'Z';
+        BDC  : inout std_logic;
         IO   : inout std_logic_vector(2 downto 0) := "ZZZ";
         LED  : out   std_logic_vector(1 downto 0);
         Clk  : in    std_logic);
 end bdc;
 
 architecture Behavioral of bdc is
-  signal count   : std_logic_vector (3 downto 0) := x"0";
-  signal counthi : std_logic_vector (3 downto 0) := x"0";
+  signal countall: std_logic_vector (7 downto 0) := x"00";
   signal data    : std_logic_vector (3 downto 0) := x"0";
+
+  alias count   : std_logic_vector (3 downto 0) is countall(3 downto 0);
+  alias counthi : std_logic_vector (3 downto 0) is countall(7 downto 4);
 
   attribute reg : string;
   attribute reg of data : signal is "tff";
@@ -106,7 +108,14 @@ begin
     variable index : integer;
   begin
     if Clk_main'event then
-      count <= count + x"1";
+
+      -- Maintain the bit and sub-bit number.  Don't modify counthi during ack
+      -- because we want to send counthi in the response...
+      if state /= ack then
+        countall <= countall + 1;
+      else
+        count <= count + 1;
+      end if;
 
       do_bits := state = send_bits or state = read_bits;
       index := conv_integer(STOP(1 downto 0) - counthi(1 downto 0));
@@ -134,14 +143,8 @@ begin
         data(index) <= data(index) xor BDC;
       end if;
 
-      -- Maintain the bit number.  Doing this on count=0 means counthi is
-      -- correct if we finish a sync on the same clock as counthi increments.
-      if count = x"0" and state /= ack then
-        counthi <= counthi + '1';
-      end if;
-
       -- At the end of sync_init, transfer to sync_gap, do the BDC speed-up.
-      if state = sync_init and counthi = x"F" and count = x"F" then
+      if state = sync_init and countall = x"FF" then
         state <= sync_gap;
         BDCdata <= '1';
       end if;
@@ -163,13 +166,12 @@ begin
       -- In read sync, we're waiting for a BDC 0-to-1 transition & we also
       -- time out.
       sync_done := ((state = sync_gap or state = sync_wait)
-                    and counthi = x"F" and count = x"F")
+                    and countall = x"FF")
                    or (state = sync_wait and BDCsync = '1');
 
       if BDCsync = '0' and state = sync_gap then
         state <= sync_wait;
-        counthi <= x"F";
-        count <= x"0";
+        countall <= x"00";
       end if;
       if sync_done then
         state <= ack;
@@ -216,7 +218,7 @@ begin
       -- Process command, or stay in idle if no command.  The 'state=idle'
       -- is formally redundant but helps XST simplify things.
       if state = idle and RDiint = '0' then
-        counthi <= "1111";
+        counthi <= x"F";
 
         if DQ(7 downto 4) = x"3" then -- 0...9 & extras
           data <= data xor DQ(3 downto 0);
@@ -229,7 +231,7 @@ begin
           state <= read_bits;
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
-          data <= not data;
+--          data <= not data;
         elsif DQ(7 downto 2) = "010000" then -- @,A,B,C
           clkspeed <= DQ(1 downto 0);
         elsif DQ(7 downto 1) = "0100010" then -- D,E
@@ -260,7 +262,7 @@ begin
   process (Clk)
   begin
     if Clk'event then
-      if counthi = x"0" and count = x"0" and not ACTidle then
+      if countall = x"00" and not ACTidle then
         ACTcnt <= ACTcnt + 1;
       end if;
       if RDiint = '0' and ACTidle then
