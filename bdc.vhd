@@ -15,22 +15,19 @@ entity bdc is
         WR   :   out std_logic;
         BDC  : inout std_logic;
         IO   : inout std_logic_vector(2 downto 0) := "ZZZ";
-        LED  : out   std_logic_vector(1 downto 0);
+        LED  :   out std_logic_vector(1 downto 0);
         Clk  : in    std_logic);
 end bdc;
 
 architecture Behavioral of bdc is
-  signal countall: std_logic_vector (7 downto 0) := x"00";
-  signal data    : std_logic_vector (3 downto 0) := x"0";
+  signal count  : std_logic_vector(7 downto 0) := x"00";
+  signal data   : std_logic_vector(3 downto 0) := x"0";
 
-  alias count   : std_logic_vector (3 downto 0) is countall(3 downto 0);
-  alias counthi : std_logic_vector (3 downto 0) is countall(7 downto 4);
+  alias countlo : std_logic_vector(3 downto 0) is count(3 downto 0);
+  alias counthi : std_logic_vector(3 downto 0) is count(7 downto 4);
 
-  attribute reg : string;
-  attribute reg of data : signal is "tff";
-
-  type state_t is (ack, idle, send_bits, read_bits,
-                   sync_init, sync_gap, sync_wait);
+  type state_t is (idle, ack, send_bits, read_bits,
+                   sync_wait, sync_gap, sync_init);
 
   signal state : state_t := idle;
 
@@ -64,11 +61,7 @@ architecture Behavioral of bdc is
   -- 14 - start command read (could do 13,14!).
   -- 15 - read next command.
 
-  signal hex_alpha : boolean;
   signal hex_in : boolean;
-
-  attribute keep : string;
-  attribute keep of hex_alpha : signal is "TRUE";
 
   constant ACTlen : integer := 13;
   signal ACTcnt : std_logic_vector(ACTlen - 1 downto 0);
@@ -85,8 +78,6 @@ begin
 
   LED <= LEDval;
 
-  hex_alpha <= counthi = STOP
-               and (data(3) and (data(2) or data(1))) = '1';
   hex_in <= DQ(7 downto 4) = x"6" or DQ(7 downto 4) = x"3";
 
   -- The 8MHz input clock gets divided by 1, 2, 3 or 4 to generate Clk_main.
@@ -104,17 +95,16 @@ begin
 
   process (Clk_main)
     variable do_bits : boolean;
-    variable sync_done : boolean;
     variable index : integer;
   begin
     if Clk_main'event then
 
       -- Maintain the bit and sub-bit number.  Don't modify counthi during ack
       -- because we want to send counthi in the response...
-      if state /= ack then
-        countall <= countall + 1;
-      else
+      if state /= ack and state /= idle then
         count <= count + 1;
+      else
+        countlo <= countlo + 1;
       end if;
 
       do_bits := state = send_bits or state = read_bits;
@@ -122,29 +112,29 @@ begin
 
       -- During a data cycle, do the BDC data.  During sync, drive low
       -- with one cycle speed up.
-      if count = x"0" then
+      if countlo = x"0" then
         BDCdata <= '0';
-      elsif count = x"4" and state = send_bits and data(index) = '1' then
+      elsif countlo = x"4" and state = send_bits and data(index) = '1' then
         BDCdata <= '1';
-      elsif count = x"D" and state = send_bits then
+      elsif countlo = x"D" and state = send_bits then
         BDCdata <= '1';
       end if;
 
       -- BDC out enable.
-      if count = x"0" then
+      if countlo = x"0" then
         BDCout <= do_bits or state = sync_init or LEDval(0) = '0';
       end if;
-      if count = x"4" and state = read_bits then
+      if countlo = x"4" and state = read_bits then
         BDCout <= false;
       end if;
 
       -- BDC sampling cycle.
-      if count = x"A" and state = read_bits then
+      if countlo = x"A" and state = read_bits then
         data(index) <= data(index) xor BDC;
       end if;
 
       -- At the end of sync_init, transfer to sync_gap, do the BDC speed-up.
-      if state = sync_init and countall = x"FF" then
+      if state = sync_init and count = x"FF" then
         state <= sync_gap;
         BDCdata <= '1';
       end if;
@@ -157,29 +147,26 @@ begin
         BDCsync <= '1';
       end if;
 
-      -- It's cheaper to maintain data to shadow counter rather than to transfer
-      -- count to data later on.
+      -- It's cheaper to maintain data to shadow countlo rather than to transfer
+      -- countlo to data later on.
       if state = sync_wait then
         data <= data + x"1";
       end if;
 
       -- In read sync, we're waiting for a BDC 0-to-1 transition & we also
       -- time out.
-      sync_done := ((state = sync_gap or state = sync_wait)
-                    and countall = x"FF")
-                   or (state = sync_wait and BDCsync = '1');
-
       if BDCsync = '0' and state = sync_gap then
         state <= sync_wait;
-        countall <= x"00";
+        count <= x"00";
       end if;
-      if sync_done then
+      if ((state = sync_gap or state = sync_wait) and count = x"FF")
+        or (state = sync_wait and BDCsync = '1') then
         state <= ack;
       end if;
 
       -- Send data at the end of the read_bits and ack commands.
-      if count = x"C" and ((counthi = STOP and state = read_bits)
-                           or state = ack) then
+      if countlo = x"C" and ((counthi = STOP and state = read_bits)
+                             or state = ack) then
         state <= idle;
         WRint <= '1';
       else
@@ -187,7 +174,8 @@ begin
       end if;
 
       -- Convert the nibble we've just read to hex.
-      if count = x"C" and state = read_bits and hex_alpha then
+      if count = STOP & x"C" and state = read_bits
+        and (data(3) and (data(2) or data(1))) = '1' then
         data(0) <= not data(0);
         data(1) <= data(1) xor not data(0);
         data(2) <= data(2) xor (not data(1) and not data(0));
@@ -198,12 +186,12 @@ begin
       end if;
 
       -- Exit send bits at the right moment...
-      if count = x"D" and counthi = STOP and state = send_bits then
+      if countlo = x"D" and counthi = STOP and state = send_bits then
         state <= idle;
       end if;
 
       -- Ask for next command if we want data and it's available.
-      if count = x"E" and state = idle and RXFi = '0' then
+      if countlo = x"E" and state = idle and RXFi = '0' then
         RDiint <= '0';
       else
         RDiint <= '1';
@@ -231,7 +219,6 @@ begin
           state <= read_bits;
         elsif DQ = x"21" then -- '!'
           state <= sync_init;
---          data <= not data;
         elsif DQ(7 downto 2) = "010000" then -- @,A,B,C
           clkspeed <= DQ(1 downto 0);
         elsif DQ(7 downto 1) = "0100010" then -- D,E
@@ -256,13 +243,12 @@ begin
   ACTidle <= ACTcnt = 0;
   LEDval(1) <= '1' when ACTidle else '0';
 
-  -- the 8MHz clock gives a 16MHz edge rate; this is divided by 256 by
-  -- count & counthi, and then by 8192 by a separate counter to give aprox
-  -- 1/8 second activity pulse.
+  -- The 8MHz clock gives a 16MHz edge rate; this is divided by 256 by count
+  -- to 64KHz and then by 8192 to give aprox 1/8 second activity pulse.
   process (Clk)
   begin
     if Clk'event then
-      if countall = x"00" and not ACTidle then
+      if count = x"00" and not ACTidle then
         ACTcnt <= ACTcnt + 1;
       end if;
       if RDiint = '0' and ACTidle then
